@@ -55,7 +55,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'], # BASE_DIR = 기본경로 를말함 '  /home/mino/projects/mysite '
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
