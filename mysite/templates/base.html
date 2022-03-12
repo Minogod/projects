@@ -1,0 +1,27 @@
+{% load static %}
+<!doctype html>
+<html lang="ko">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+    <!-- pybo CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <title>Hello, pybo!</title>
+    {% comment %} 링크 = 해당문서와 외부소스를 정의할때 사용
+이 요소는 빈태그이며 속성만 포함함
+주로 외부 스타일시트를 연결할때사용
+rel = 필수속성으로 현재문서와 외부소스 사이의 연관관계를 명시함
+type = 링크된 외부 리소스의 미디어 타입을 명시함 
+href = 링크될 외부 리소스의 url을 명시함 {% endcomment %}
+</head>
+<body>
+<!-- 기본 템플릿 안에 삽입될 내용 Start -->
+{% block content %}
+<!-- 이 탬플릿을 쓰면 block content 안에다가 내용을 집어넣음  -->
+{% endblock %}
+<!-- 기본 템플릿 안에 삽입될 내용 End -->
+</body>
+</html>

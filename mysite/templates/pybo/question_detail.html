@@ -1,13 +1,6 @@
-{% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
-{% comment %} 링크 = 해당문서와 외부소스를 정의할때 사용
-이 요소는 빈태그이며 속성만 포함함
-주로 외부 스타일시트를 연결할때사용
-rel = 필수속성으로 현재문서와 외부소스 사이의 연관관계를 명시함
-type = 링크된 외부 리소스의 미디어 타입을 명시함 
-href = 링크될 외부 리소스의 url을 명시함 {% endcomment %}
-
-
+{% extends 'base.html' %}
+{% block content %}
+{% comment %} base.html 을 상속받고 나머지내용을 block content안에다가 집어넣는다  {% endcomment %}
 <div class="container my-3">
     <h2 class="border-bottom py-2">{{ question.subject }}</h2>
     <div class="card my-3">
@@ -44,3 +37,4 @@ href = 링크될 외부 리소스의 url을 명시함 {% endcomment %}
         <input type="submit" value="답변등록" class="btn btn-primary">
     </form>
 </div>
+{% endblock %}
