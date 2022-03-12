@@ -44,10 +44,18 @@ def question_create(request):
     """
     질문등록
     """
-    form = QuestionForm()
-    return render(request, 'pybo/question_form.html',{'form':form})
+    if request.method == 'POST': # 요청값이 get 인지 post 인지 구분 
+        form = QuestionForm(request.POST) # 받은 값 을 QuestionForm 인자에 넣어서 form 변수로 지정
+        if form.is_valid(): # 폼이 유효한지 검사 vaild = 확인  
+            question = form.save(commit=False) # form 이 유효하다면 아직 create_date가 비여있어서 바로 save를 할수없다 commit(기록)=False는 임시저장을 의미한다
+            question.create_date = timezone.now() # question의 필수요소 3번째 인자 create_date를 입력하고
+            question.save() # save한다.
+            return redirect('pybo:index') # render 와 redirect 차이 : redirect 는 변수를 html로 보낼수없다 그냥 경로지정만 가능 
+    else:
+        form = QuestionForm()
+    context = {'form':form}
+    return render(request, 'pybo/question_form.html', context)
     # render 모듈 context 인자를 dictionary 형태로 보내주는데 
     # 함수 내에서 따로 지정안하고 바로 적어둔형태
     # html에서 {{key값 }}을 입력하면 value 값으로 보인다. 즉 key 값 form = value 값  form 이라 함수 변수 form = QuestionForm()이 되게된다. 
     # 여기서 변수 QuestionForm()은 mysite/forms.py 에서 import 된 QuestionForm 이다
-    # 
