@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import Question, Answer
-from .forms import QuestionForm
+from .forms import QuestionForm,AnswerForm
 # Create your views here.
 
 def index(request):
@@ -30,9 +30,18 @@ def answer_create(request, question_id):
     pybo 답변등록
     """
     question = get_object_or_404(Question,pk= question_id)
-    answer = Answer(question = question, content=request.POST.get('content'), create_date=timezone.now())
-    answer.save()
-    return redirect('pybo:detail', question_id = question_id)
+    if request.method == "POST":
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.save(commit=False)
+            answer.create_date = timezone.now()
+            answer.question = question
+            answer.save()
+            return redirect('pybo:detail', question_id=question.id)
+    else:
+        form = AnswerForm()
+    context = {'question': question, 'form': form}
+    return render(request, 'pybo/question_detail.html', context)  
     # 인자로 받은 요청,질문 id값 
     # 질문 = 질문번호가있으면 질문번호 = 질문 , 없으면 404에러 /
     # 답변 = 데이터베이스 답변 (질문 = 질문, 내용 = http에서 받은요청값.post 에서 'content'값을 content로 설정 , 시간 = timzone 지금시간  )
@@ -49,6 +58,7 @@ def question_create(request):
         if form.is_valid(): # 폼이 유효한지 검사 vaild = 확인  
             question = form.save(commit=False) # form 이 유효하다면 아직 create_date가 비여있어서 바로 save를 할수없다 commit(기록)=False는 임시저장을 의미한다
             question.create_date = timezone.now() # question의 필수요소 3번째 인자 create_date를 입력하고
+            question.ip = request.META['REMOTE_ADDR'] # IP받기?
             question.save() # save한다.
             return redirect('pybo:index') # render 와 redirect 차이 : redirect 는 변수를 html로 보낼수없다 그냥 경로지정만 가능 
     else:

@@ -1,5 +1,5 @@
 from django import forms
-from pybo.models import Question
+from pybo.models import Question,Answer
 
 #  form 은 페이지 요청시 전달되는 파라미터 들을 쉽게 관리하기 위해 사용하는 클래스이다.
 # 폼은 필수 파라미터의 값이 누락되지않았는지 적절한지등 검증할 목적으로 사용한다.
@@ -27,3 +27,11 @@ class QuestionForm(forms.ModelForm):
 # widgets을 추가하여 
 # attrs = attribute(속성)의 약어
 # 부스트트랩 클래스를 이용할수있다. 어떻게 ??
+
+class AnswerForm(forms.ModelForm):
+    class Meta:
+        model = Answer
+        fields = ['content']
+        labels = {
+            'content': '답변내용',
+        }
