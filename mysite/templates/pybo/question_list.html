@@ -31,6 +31,51 @@
         {% endif %}
         </tbody>
     </table>
+    <!-- 페이징처리 시작 -->
+    <ul class="pagination justify-content-center">
+            <!-- 이전페이지 -->
+            {% if question_list.has_previous %} 
+            {% comment %} 이전페이지가 있는지 체크 previous = 이전 {% endcomment %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ question_list.previous_page_number }}">이전</a>
+                {% comment %} 이전페이지가 있으면 이전페이지 이전페이지로 하이퍼링크 {% endcomment %}
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
+                {% comment %} 없으면 그냥 기능없는 이전버튼  {% endcomment %}
+            </li>
+            {% endif %}
+            <!-- 페이지리스트 -->
+            {% for page_number in question_list.paginator.page_range %}
+            {% if page_number >= question_list.number|add:-5 and page_number <= question_list.number|add:5 %}
+            {% comment %} |add:-5 = 5를 빼라는 템플릿 필터  {% endcomment %}
+                {% if page_number == question_list.number %}
+                {% comment %} 현재페이지와 페이지 리스트상의 페이지가 같으면 {% endcomment %}
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+                    {% comment %} 활성화된버튼 (파란색) {% endcomment %}
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+                    {% comment %} 아니면 페이지넘버 버튼 생성 하이퍼링크 = 페이지넘버 {% endcomment %}
+                </li>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        <!-- 다음페이지 -->
+        {% if question_list.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ question_list.next_page_number }}">다음</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tabindex="-1" aria-disabled="true" href="#">다음</a>
+        </li>
+        {% endif %}
+    </ul>
+    <!-- 페이징처리 끝 -->
     <a href="{% url 'pybo:question_create' %}" class="btn btn-primary">질문 등록하기</a>
 </div>
 {% endblock %}

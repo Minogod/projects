@@ -2,14 +2,27 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import Question, Answer
 from .forms import QuestionForm,AnswerForm
+from django.core.paginator import Paginator  
 # Create your views here.
 
 def index(request):
     """
     pybo 목록 출력
     """
+    # 입력 파라미터
+    page = request.GET.get('page', '1')  # 페이지
+    #get방식으로 호출된 url 에서 page 값을 받아옴 디폴트값 1로지정
+
+    # 조회
     question_list = Question.objects.order_by('-create_date') # order_by = 정령 
-    context = {'question_list':question_list}
+
+    # 페이징처리
+    paginator = Paginator(question_list, 10)  # 페이지당 10개씩 보여주기
+    # Paginator
+    page_obj = paginator.get_page(page)
+
+    context = {'question_list': page_obj}
+    # context = {'question_list':question_list}
     return render(request, 'pybo/question_list.html',context) 
     # render(request,template_name,context=None, content_type=None, status=None, using=None)
     # 여기서 request 와 template_name 은 필수인자로 받아야한다
