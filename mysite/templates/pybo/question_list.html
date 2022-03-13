@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load pybo_filter %}
+{% comment %} 필터 사용하기  {% endcomment %}
 {% block content %}
 <div class="container my-3">
     <table class="table">
@@ -13,7 +15,10 @@
         {% if question_list %}
         {% for question in question_list %}
         <tr>
-            <td>{{ forloop.counter }}</td>
+            <td>
+                <!-- 번호 = 전체건수 - 시작인덱스 - 현재인덱스 + 1 -->
+                {{ question_list.paginator.count|sub:question_list.start_index|sub:forloop.counter0|add:1 }}
+            </td>
             <td>
                 <a href="{% url 'pybo:detail' question.id %}">{{ question.subject }}</a>
             </td>
@@ -48,7 +53,7 @@
             {% endif %}
             <!-- 페이지리스트 -->
             {% for page_number in question_list.paginator.page_range %}
-            {% if page_number >= question_list.number|add:-5 and page_number <= question_list.number|add:5 %}
+            {% if page_number >=  question_list.number|add:-5 and page_number <= question_list.number|add:5 %}
             {% comment %} |add:-5 = 5를 빼라는 템플릿 필터  {% endcomment %}
                 {% if page_number == question_list.number %}
                 {% comment %} 현재페이지와 페이지 리스트상의 페이지가 같으면 {% endcomment %}
