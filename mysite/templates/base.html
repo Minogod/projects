@@ -20,12 +20,16 @@ href = 링크될 외부 리소스의 url을 명시함 {% endcomment %}
 <body>
 <!-- 네비게이션바 include = 특정위치에 다른탬플릿 삽입-->
 {% include "navbar.html" %}
+<!-- 기본 템플릿 안에 삽입될 내용 Start -->
+{% block content %}
+<!-- 이 탬플릿을 쓰면 block content 안에다가 내용을 집어넣음  -->
+{% endblock %}
+<!-- 기본 템플릿 안에 삽입될 내용 End -->
 
 <!-- jQuery JS -->
 <script src="{% static 'jquery-3.6.0.min.js' %}"></script>
 <!-- Bootstrap JS -->
 <script src="{% static 'bootstrap.min.js' %}"></script>
-
 <!-- 자바스크립트 Start -->
 {% block script %}
 {% endblock %}
