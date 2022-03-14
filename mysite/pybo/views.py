@@ -4,6 +4,7 @@ from .models import Question, Answer
 from .forms import QuestionForm,AnswerForm
 from django.core.paginator import Paginator  
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 # @login_required 어노테이션은 login_url='common:login' 처럼 로그인 URL을 지정할 수 있다.
 # Create your views here.
 
@@ -87,3 +88,40 @@ def question_create(request):
     # 함수 내에서 따로 지정안하고 바로 적어둔형태
     # html에서 {{key값 }}을 입력하면 value 값으로 보인다. 즉 key 값 form = value 값  form 이라 함수 변수 form = QuestionForm()이 되게된다. 
     # 여기서 변수 QuestionForm()은 mysite/forms.py 에서 import 된 QuestionForm 이다
+
+
+
+@login_required(login_url='common:login')
+def question_modify(request, question_id):
+    """
+    pybo 질문수정
+    """
+    question = get_object_or_404(Question, pk=question_id)
+    if request.user != question.author:
+        messages.error(request, '수정권한이 없습니다')
+        return redirect('pybo:detail', question_id=question.id)
+
+    if request.method == "POST":
+        form = QuestionForm(request.POST, instance=question)
+        if form.is_valid():
+            question = form.save(commit=False)
+            question.modify_date = timezone.now()  # 수정일시 저장
+            question.save()
+            return redirect('pybo:detail', question_id=question.id)
+    else:
+        form = QuestionForm(instance=question)
+    context = {'form': form}
+    return render(request, 'pybo/question_form.html', context)
+
+
+@login_required(login_url='common:login')
+def question_delete(request, question_id):
+    """
+    pybo 질문삭제
+    """
+    question = get_object_or_404(Question, pk=question_id)
+    if request.user != question.author:
+        messages.error(request, '삭제권한이 없습니다')
+        return redirect('pybo:detail', question_id=question.id)
+    question.delete()
+    return redirect('pybo:index')

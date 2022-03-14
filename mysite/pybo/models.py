@@ -9,6 +9,7 @@ class Question(models.Model):
     content = models.TextField()
     create_date = models.DateTimeField()
     ip = models.CharField(max_length=200,default=False)
+    modify_date = models.DateTimeField(null=True, blank=True)
     def __str__(self):
         return self.subject
 
@@ -17,3 +18,7 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     content = models.TextField(default = False)
     create_date = models.DateTimeField()
+    modify_date = models.DateTimeField(null=True, blank=True)
+
+    # null=True = 값이 없어도된다
+    # blank=True =  form.is_valid()를 통한 입력 데이터 검사 시 값이 없어도 된다는 의미

@@ -2,6 +2,15 @@
 {% block content %}
 {% comment %} base.html 을 상속받고 나머지내용을 block content안에다가 집어넣는다  {% endcomment %}
 <div class="container my-3">
+    <!-- 사용자오류 표시 -->
+    {% if messages %}
+    <div class="alert alert-danger my-3" role="alert">
+    {% for message in messages %}
+        <strong>{{ message.tags }}</strong>
+        <ul><li>{{ message.message }}</li></ul>
+    {% endfor %}
+    </div>
+    {% endif %}
     <h2 class="border-bottom py-2">{{ question.subject }}</h2>
     <div class="card my-3">
         <div class="card-body">
@@ -12,6 +21,15 @@
                     <div>{{ question.create_date }}</div>
                 </div>
             </div>
+            {% if request.user == question.author %}
+            <div class="my-3">
+                <a href="{% url 'pybo:question_modify' question.id  %}" 
+                   class="btn btn-sm btn-outline-secondary">수정</a>
+                <a href="#" class="delete btn btn-sm btn-outline-secondary"
+                data-uri="{% url 'pybo:question_delete' question.id  %}">삭제</a>
+                {% comment %} data-uri 속성은 제이쿼리에서 $(this).data('uri')와 같이 사용하여 그 값을 얻을 수 있다. {% endcomment %}
+            </div>
+            {% endif %}
         </div>
     </div>
     <h5 class="border-bottom my-3 py-2">{{question.answer_set.count}}개의 답변이 있습니다.</h5>
@@ -51,4 +69,15 @@
         <input type="submit" value="답변등록" class="btn btn-primary">
     </form>
 </div>
+{% endblock %}
+{% block script %}
+<script type='text/javascript'>
+$(document).ready(function(){
+    $(".delete").on('click', function() {
+        if(confirm("정말로 삭제하시겠습니까?")) {
+            location.href = $(this).data('uri');
+        }
+    });
+});
+</script>
 {% endblock %}
