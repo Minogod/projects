@@ -3,6 +3,8 @@ from django.utils import timezone
 from .models import Question, Answer
 from .forms import QuestionForm,AnswerForm
 from django.core.paginator import Paginator  
+from django.contrib.auth.decorators import login_required
+# @login_required 어노테이션은 login_url='common:login' 처럼 로그인 URL을 지정할 수 있다.
 # Create your views here.
 
 def index(request):
@@ -37,7 +39,7 @@ def detail(request, question_id):
     context = {'question': question}
     return render(request, 'pybo/question_detail.html', context)
 
-
+@login_required(login_url='common:login')
 def answer_create(request, question_id):
     """
     pybo 답변등록
@@ -47,6 +49,7 @@ def answer_create(request, question_id):
         form = AnswerForm(request.POST)
         if form.is_valid():
             answer = form.save(commit=False)
+            answer.author = request.user  # author 속성에 로그인 계정 저장
             answer.create_date = timezone.now()
             answer.question = question
             answer.save()
@@ -62,6 +65,7 @@ def answer_create(request, question_id):
     #  return  redirect = 다시보낸다 'pybo:detail, question_id = question_id'를  
     # 여기서 pybo:detail = [설정해둔 app명별칭]:[url 별칭],이다 결국  http://localhost:8000/pybo/ + question_id 값의 url이 다시 보내진다 는 것
 
+@login_required(login_url='common:login')
 def question_create(request):
     """
     질문등록
@@ -70,6 +74,7 @@ def question_create(request):
         form = QuestionForm(request.POST) # 받은 값 을 QuestionForm 인자에 넣어서 form 변수로 지정
         if form.is_valid(): # 폼이 유효한지 검사 vaild = 확인  
             question = form.save(commit=False) # form 이 유효하다면 아직 create_date가 비여있어서 바로 save를 할수없다 commit(기록)=False는 임시저장을 의미한다
+            question.author = request.user  # author 속성에 로그인 계정 저장
             question.create_date = timezone.now() # question의 필수요소 3번째 인자 create_date를 입력하고
             question.ip = request.META['REMOTE_ADDR'] # IP받기?
             question.save() # save한다.
