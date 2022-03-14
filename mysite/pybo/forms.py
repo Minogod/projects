@@ -1,5 +1,5 @@
 from django import forms
-from pybo.models import Question,Answer
+from pybo.models import Question,Answer, Comment
 
 #  form 은 페이지 요청시 전달되는 파라미터 들을 쉽게 관리하기 위해 사용하는 클래스이다.
 # 폼은 필수 파라미터의 값이 누락되지않았는지 적절한지등 검증할 목적으로 사용한다.
@@ -34,4 +34,12 @@ class AnswerForm(forms.ModelForm):
         fields = ['content']
         labels = {
             'content': '답변내용',
+        }
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        labels = {
+            'content': '댓글내용',
         }
