@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, Count
 from ..forms import AnswerForm, CommentForm, QuestionForm
 from ..models import Answer, Comment, Question
 
@@ -19,9 +19,16 @@ def index(request):
     page = request.GET.get('page', '1')  # 페이지
     #get방식으로 호출된 url 에서 page 값을 받아옴 디폴트값 1로지정
     kw = request.GET.get('kw', '')  # 검색어
+    so = request.GET.get('so', 'recent')  # 정렬기준
 
-    # 조회
-    question_list = Question.objects.order_by('-create_date') # order_by = 정령 
+    # 정렬
+    if so == 'recommend':
+        question_list = Question.objects.annotate(num_voter=Count('voter')).order_by('-num_voter', '-create_date')
+    elif so == 'popular':
+        question_list = Question.objects.annotate(num_answer=Count('answer')).order_by('-num_answer', '-create_date')
+    else:  # recent
+        question_list = Question.objects.order_by('-create_date')
+    #검색
     if kw:
         question_list = question_list.filter(
             Q(subject__icontains=kw) |  # 제목검색
@@ -35,7 +42,7 @@ def index(request):
     # Paginator
     page_obj = paginator.get_page(page)
 
-    context = {'question_list': page_obj, 'page': page, 'kw': kw}
+    context = {'question_list': page_obj, 'page': page, 'kw': kw, 'so': so}
     # context = {'question_list':question_list}
     return render(request, 'pybo/question_list.html',context) 
     # render(request,template_name,context=None, content_type=None, status=None, using=None)
