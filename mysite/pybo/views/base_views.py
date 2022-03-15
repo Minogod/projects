@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-
+from django.db.models import Q
 from ..forms import AnswerForm, CommentForm, QuestionForm
 from ..models import Answer, Comment, Question
 
@@ -18,16 +18,24 @@ def index(request):
     # 입력 파라미터
     page = request.GET.get('page', '1')  # 페이지
     #get방식으로 호출된 url 에서 page 값을 받아옴 디폴트값 1로지정
+    kw = request.GET.get('kw', '')  # 검색어
 
     # 조회
     question_list = Question.objects.order_by('-create_date') # order_by = 정령 
+    if kw:
+        question_list = question_list.filter(
+            Q(subject__icontains=kw) |  # 제목검색
+            Q(content__icontains=kw) |  # 내용검색
+            Q(author__username__icontains=kw) |  # 질문 글쓴이검색
+            Q(answer__author__username__icontains=kw)  # 답변 글쓴이검색
+        ).distinct()
 
     # 페이징처리
     paginator = Paginator(question_list, 10)  # 페이지당 10개씩 보여주기
     # Paginator
     page_obj = paginator.get_page(page)
 
-    context = {'question_list': page_obj}
+    context = {'question_list': page_obj, 'page': page, 'kw': kw}
     # context = {'question_list':question_list}
     return render(request, 'pybo/question_list.html',context) 
     # render(request,template_name,context=None, content_type=None, status=None, using=None)

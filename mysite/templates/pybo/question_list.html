@@ -3,6 +3,14 @@
 {% comment %} 필터 사용하기  {% endcomment %}
 {% block content %}
 <div class="container my-3">
+    <div class="row justify-content-end my-3">
+        <div class="col-4 input-group">
+            <input type="text" class="form-control kw" value="{{ kw|default_if_none:'' }}">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+            </div>
+        </div>
+    </div>
     <table class="table">
         <thead>
         <tr class="text-center thead-dark">
@@ -53,7 +61,7 @@
             {% if question_list.has_previous %} 
             {% comment %} 이전페이지가 있는지 체크 previous = 이전 {% endcomment %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ question_list.previous_page_number }}">이전</a>
+                <a class="page-link" data-page="{{ question_list.previous_page_number }}" href="#">이전</a>
                 {% comment %} 이전페이지가 있으면 이전페이지 이전페이지로 하이퍼링크 {% endcomment %}
             </li>
             {% else %}
@@ -69,12 +77,12 @@
                 {% if page_number == question_list.number %}
                 {% comment %} 현재페이지와 페이지 리스트상의 페이지가 같으면 {% endcomment %}
                 <li class="page-item active" aria-current="page">
-                    <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+                    <a class="page-link" data-page="{{ page_number }}" href="#">{{ page_number }}</a>
                     {% comment %} 활성화된버튼 (파란색) {% endcomment %}
                 </li>
                 {% else %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+                    <a class="page-link" data-page="{{ page_number }}" href="#">{{ page_number }}</a>
                     {% comment %} 아니면 페이지넘버 버튼 생성 하이퍼링크 = 페이지넘버 {% endcomment %}
                 </li>
                 {% endif %}
@@ -83,7 +91,7 @@
         <!-- 다음페이지 -->
         {% if question_list.has_next %}
         <li class="page-item">
-            <a class="page-link" href="?page={{ question_list.next_page_number }}">다음</a>
+            <a class="page-link" data-page="{{ question_list.next_page_number }}" href="#">다음</a>
         </li>
         {% else %}
         <li class="page-item disabled">
@@ -94,4 +102,24 @@
     <!-- 페이징처리 끝 -->
     <a href="{% url 'pybo:question_create' %}" class="btn btn-primary">질문 등록하기</a>
 </div>
+<form id="searchForm" method="get" action="{% url 'index' %}">
+    <input type="hidden" id="kw" name="kw" value="{{ kw|default_if_none:'' }}">
+    <input type="hidden" id="page" name="page" value="{{ page }}">
+</form>
+{% endblock %}
+{% block script %}
+<script type='text/javascript'>
+$(document).ready(function(){
+    $(".page-link").on('click', function() {
+        $("#page").val($(this).data("page"));
+        $("#searchForm").submit();
+    });
+
+    $("#btn_search").on('click', function() {
+        $("#kw").val($(".kw").val());
+        $("#page").val(1);  // 검색버튼을 클릭할 경우 1페이지부터 조회한다.
+        $("#searchForm").submit();
+    });
+});
+</script>
 {% endblock %}
