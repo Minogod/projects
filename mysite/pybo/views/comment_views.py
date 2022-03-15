@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect, render, resolve_url
 from django.utils import timezone
 
 from ..forms import AnswerForm, CommentForm, QuestionForm
@@ -26,7 +26,8 @@ def comment_create_question(request, question_id):
             comment.create_date = timezone.now()
             comment.question = question
             comment.save()
-            return redirect('pybo:detail', question_id=question.id)
+            return redirect('{}#comment_{}'.format(  # 앵커기능
+                resolve_url('pybo:detail', question_id=comment.question.id), comment.id))
     else:
         form = CommentForm()
     context = {'form': form}
@@ -49,7 +50,8 @@ def comment_modify_question(request, comment_id):
             comment = form.save(commit=False)
             comment.modify_date = timezone.now()
             comment.save()
-            return redirect('pybo:detail', question_id=comment.question.id)
+            return redirect('{}#comment_{}'.format(
+                resolve_url('pybo:detail', question_id=comment.question.id), comment.id))
     else:
         form = CommentForm(instance=comment)
     context = {'form': form}
@@ -82,7 +84,8 @@ def comment_create_answer(request, answer_id):
             comment.create_date = timezone.now()
             comment.answer = answer
             comment.save()
-            return redirect('pybo:detail', question_id=comment.answer.question.id)
+            return redirect('{}#comment_{}'.format(
+                resolve_url('pybo:detail', question_id=comment.answer.question.id), comment.id))
     else:
         form = CommentForm()
     context = {'form': form}
@@ -120,7 +123,8 @@ def comment_delete_answer(request, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id)
     if request.user != comment.author:
         messages.error(request, '댓글삭제권한이 없습니다')
-        return redirect('pybo:detail', question_id=comment.answer.question.id)
+        return redirect('{}#comment_{}'.format(
+                resolve_url('pybo:detail', question_id=comment.answer.question.id), comment.id))
     else:
         comment.delete()
     return redirect('pybo:detail', question_id=comment.answer.question.id)
